@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Carregar a imagem
-image = cv2.imread('testeMapa2.jpg')
+image = cv2.imread('teste4.jpg')
 
 # Definir o tamanho dos quadrados e as letras para cada coluna
 square_width = 91
@@ -22,8 +22,10 @@ def detectar_azul(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     h = 105
     tolerance = 10
-    blue_mask1 = np.array([90, 50, 50])
-    blue_mask2 = np.array([130, 255, 255])
+    #blue_mask1 = np.array([90, 50, 50])
+    #blue_mask2 = np.array([130, 255, 255])
+    blue_mask1 = np.array([0, 50, 50])
+    blue_mask2 = np.array([10, 255, 255])
 
     # Criar uma máscara para a cor azul
     mask = cv2.inRange(hsv, blue_mask1,blue_mask2)
