@@ -1,72 +1,72 @@
 import cv2
-import json
 import numpy as np
 
-# Carregar parâmetros da câmera a partir de um arquivo JSON
-with open('calibration_results.json', 'r') as json_file:
-    calibration_data = json.load(json_file)
+def encontrar_maior_componente(image, cor):
+    # Convertendo a imagem para o espaço de cores HSV
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    
+    # Definindo os intervalos de cor para a cor especificada em HSV
+    if cor == 'vermelho':
+        lower_color = np.array([0, 100, 100])
+        upper_color = np.array([11, 255, 255])
+    elif cor == 'azul':
+        lower_color = np.array([90, 100, 100])
+        upper_color = np.array([130, 255, 255])
+    else:
+        raise ValueError("Cor inválida")
+    
+    # Criando a máscara para a cor especificada
+    mask = cv2.inRange(hsv, lower_color, upper_color)
+    
+    kernel = np.ones((5,5), np.uint8)
+    mask = cv2.dilate(mask, kernel, iterations=1)
+    mask = cv2.erode(mask, kernel, iterations=1)
+    
+    # Encontrando os contornos na máscara
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    # Encontrando o maior contorno
+    maior_contorno = max(contours, key=cv2.contourArea)
+    
+    # Criando uma máscara contendo apenas o maior componente
+    mask_maior_componente = np.zeros_like(mask)
+    cv2.drawContours(mask_maior_componente, [maior_contorno], -1, 255, -1)
+    
+    # Aplicando a máscara à imagem original
+    maior_componente = cv2.bitwise_and(image, image, mask=mask_maior_componente)
+    
+    # Encontrando o centroide do maior componente
+    momento_maior = cv2.moments(maior_contorno)
+    centroide_maior = (int(momento_maior["m10"] / momento_maior["m00"]), int(momento_maior["m01"] / momento_maior["m00"])) if momento_maior["m00"] != 0 else None
+    
+    return mask_maior_componente, maior_componente, centroide_maior
 
-mtx = np.array(calibration_data['intrinsics']['mtx'], dtype=np.float32)
-dist = np.array(calibration_data['intrinsics']['dist'], dtype=np.float32)
+# Carregando a imagem
+image = cv2.imread("testeee.jpg")
 
-# Função para detectar posição do objeto
-def detect_object_position(image):
-    # Corrigir distorção na imagem
-    undistorted_img = cv2.undistort(image, mtx, dist, None, mtx)
+# Encontrando o maior componente vermelho na imagem
+mask_maior_vermelho, maior_componente_vermelho, centroide_maior_vermelho = encontrar_maior_componente(image, 'vermelho')
 
-    # Converter imagem para tons de cinza
-    gray = cv2.cvtColor(undistorted_img, cv2.COLOR_BGR2GRAY)
+# Encontrando o maior componente azul na imagem
+mask_maior_azul, maior_componente_azul, centroide_maior_azul = encontrar_maior_componente(image, 'azul')
 
-    # Converter imagem para a escala de cores RGB
-    rgb = cv2.cvtColor(undistorted_img, cv2.COLOR_BGR2RGB)
+# Combinando as máscaras dos maiores componentes
+mask_combined = cv2.bitwise_or(mask_maior_vermelho, mask_maior_azul)
 
-    # Definir intervalo de cor verde na escala RGB
-    lower_green = np.array([0, 100, 0])
-    upper_green = np.array([100, 255, 100])
+# Aplicando a máscara combinada à imagem original
+maior_componente_combined = cv2.bitwise_and(image, image, mask=mask_combined)
 
-    # Criar máscara para a cor verde
-    mask = cv2.inRange(rgb, lower_green, upper_green)
+# Exibindo o maior componente vermelho
+cv2.imshow("Maior Componente Vermelho", maior_componente_vermelho)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 
-    # Aplicar operações morfológicas para remover ruídos na máscara
-    mask = cv2.erode(mask, None, iterations=2)
-    mask = cv2.dilate(mask, None, iterations=2)
+# Exibindo o maior componente azul
+cv2.imshow("Maior Componente Azul", maior_componente_azul)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 
-    # Encontrar contornos na máscara
-    contours, _ = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    # Encontrar o contorno com a maior área (presumindo que seja o objeto de interesse)
-    if contours:
-        largest_contour = max(contours, key=cv2.contourArea)
-        # Calcule o centro do contorno
-        M = cv2.moments(largest_contour)
-        if M["m00"] != 0:
-            cx = int(M["m10"] / M["m00"])
-            cy = int(M["m01"] / M["m00"])
-            return (cx, cy)
-    return None
-
-# Capturar vídeo da câmera
-cap = cv2.VideoCapture(0)
-
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        break
-
-    # Detectar posição do objeto
-    object_position = detect_object_position(frame)
-
-    # Desenhar uma marca na posição do objeto, se detectado
-    if object_position:
-        cv2.circle(frame, object_position, 5, (0, 255, 0), -1)
-
-    # Exibir o frame
-    cv2.imshow('Object Position Detection', frame)
-
-    # Verifique se o usuário pressionou 'q' para sair
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-# Liberar recursos
-cap.release()
+# Exibindo o maior componente combinado
+cv2.imshow("Maior Componente Combinado", maior_componente_combined)
+cv2.waitKey(0)
 cv2.destroyAllWindows()
