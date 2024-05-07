@@ -21,7 +21,7 @@ def draw_square_grid(image):
             cv2.putText(image, str(rows[i]), (start_x + 45, start_y + 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (1, 1, 1), 2)
 
 # Carregar a imagem
-image = cv2.imread('teste11.jpg')
+image = cv2.imread('teste14.jpg')
 
 # Verificar se a imagem foi carregada corretamente
 if image is None:
