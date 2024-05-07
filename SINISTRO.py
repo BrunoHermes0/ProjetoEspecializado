@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-def encontrar_menor_componente(frame, cor):
+def encontrar_maior_componente(frame, cor):
     # Convertendo o frame para o espaço de cores HSV
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
@@ -25,28 +25,29 @@ def encontrar_menor_componente(frame, cor):
     # Encontrando os contornos na máscara
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
-    # Encontrando o menor contorno
-    menor_contorno = min(contours, key=cv2.contourArea)
+    # Encontrando o maior e o segundo maior contorno
+    maiores_contornos = sorted(contours, key=cv2.contourArea, reverse=True)[:2]
     
-    # Criando uma máscara contendo apenas o menor componente
-    mask_menor_componente = np.zeros_like(mask)
-    cv2.drawContours(mask_menor_componente, [menor_contorno], -1, 255, -1)
+    # Criando uma máscara contendo apenas o maior componente
+    mask_maior_componente = np.zeros_like(mask)
+    cv2.drawContours(mask_maior_componente, maiores_contornos[0:1], -1, 255, -1)
     
     # Aplicando a máscara ao frame original
-    menor_componente = cv2.bitwise_and(frame, frame, mask=mask_menor_componente)
+    maior_componente = cv2.bitwise_and(frame, frame, mask=mask_maior_componente)
     
-    # Encontrando o centroide do menor componente
-    M = cv2.moments(menor_contorno)
-    if M["m00"] != 0:
-        centroide = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-    else:
-        centroide = None
+    # Encontrando os centroides do maior e do segundo maior componentes
+    centroides = []
+    for c in maiores_contornos:
+        M = cv2.moments(c)
+        if M["m00"] != 0:
+            centroide = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+            centroides.append(centroide)
     
-    return mask_menor_componente, menor_componente, centroide
+    return mask_maior_componente, maior_componente, centroides
 
-def calcular_angulo(centroide_maior, centroide_menor):
+def calcular_angulo(centroide_menor, centroide_maior):
     # Calcula o vetor entre os centroides
-    vetor = np.array(centroide_menor) - np.array(centroide_maior)
+    vetor = np.array(centroide_maior) - np.array(centroide_menor)
     
     # Calcula o ângulo entre o vetor e o eixo horizontal
     angulo_rad = np.arctan2(vetor[1], vetor[0])
@@ -188,45 +189,30 @@ while True:
     if frame_count == 10:  # A cada segundo (considerando 30 frames por segundo)
         frame_count = 0
 
-        # Encontrando o menor componente vermelho no frame
-        mask_menor_vermelho, menor_componente_vermelho, centroide_menor_vermelho = encontrar_menor_componente(frame, 'vermelho')
+        # Encontrando o maior componente vermelho no frame
+        mask_maior_vermelho, maior_componente_vermelho, centroides_vermelhos = encontrar_maior_componente(frame, 'vermelho')
 
-        # Encontrando o menor componente azul no frame
-        mask_menor_azul, menor_componente_azul, centroide_menor_azul = encontrar_menor_componente(frame, 'azul')
+        # Encontrando o maior componente azul no frame
+        mask_maior_azul, maior_componente_azul, centroides_azuis = encontrar_maior_componente(frame, 'azul')
 
-        # Encontrar a maior região vermelha
-        maior_regiao_vermelha = encontrar_maior_regiao(mask_menor_vermelho)
-        # Encontrar a maior região azul
-        maior_regiao_azul = encontrar_maior_regiao(mask_menor_azul)
-        
-        # Calcular os centroides da maior região vermelha e azul
-        centroide_maior_vermelho = calcular_centroide(maior_regiao_vermelha)
-        centroide_maior_azul = calcular_centroide(maior_regiao_azul)
+        # Calculando o ângulo entre os centroides vermelhos
+        angulo_vermelho = calcular_angulo(centroides_vermelhos[1], centroides_vermelhos[0])
 
-        # Se houver centroides detectados, calcular os ângulos
-        if centroide_maior_vermelho and centroide_maior_azul:
-            # Calculando o ângulo entre os centroides vermelhos
-            angulo_vermelho = calcular_angulo(centroide_maior_vermelho, centroide_menor_vermelho)
+        # Calculando o ângulo entre os centroides azuis
+        angulo_azul = calcular_angulo(centroides_azuis[1], centroides_azuis[0])
 
-            # Calculando o ângulo entre os centroides azuis
-            angulo_azul = calcular_angulo(centroide_maior_azul, centroide_menor_azul)
+        # Desenhando os centroides e os vetores na imagem original
+        cv2.arrowedLine(frame, centroides_vermelhos[1], centroides_vermelhos[0], (0, 0, 255), 2)
+        cv2.putText(frame, f"Vermelho: {angulo_vermelho:.2f} ", (centroides_vermelhos[0][0], centroides_vermelhos[0][1] - 20), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (1, 1, 1), 2)
+        cv2.arrowedLine(frame, centroides_azuis[1], centroides_azuis[0], (255, 0, 0), 2)
+        cv2.putText(frame, f"Azul: {angulo_azul:.2f} ", (centroides_azuis[0][0], centroides_azuis[0][1] - 20), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (1, 1, 1), 2)
 
-            # Desenhando os centroides na imagem original
-            cv2.circle(frame, centroide_menor_vermelho, 5, (0, 0, 255), -1)
-            cv2.circle(frame, centroide_menor_azul, 5, (255, 0, 0), -1)
+        # Exibindo o frame com os ângulos e os vetores
+        cv2.imshow("Frame com Angulos e Vetores", frame)
 
-            # Desenhando os vetores do maior para o menor de cada cor
-            cv2.arrowedLine(frame, centroide_maior_vermelho, centroide_menor_vermelho, (0, 0, 255), 2)  # Vetor do maior vermelho para o menor vermelho
-            cv2.putText(frame, f"Vermelho: {angulo_vermelho:.2f} ", (centroide_menor_vermelho[0], centroide_menor_vermelho[1] - 20), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (1, 1, 1), 2)
-            cv2.arrowedLine(frame, centroide_maior_azul, centroide_menor_azul, (255, 0, 0), 2)  # Vetor do maior azul para o menor azul
-            cv2.putText(frame, f"Azul: {angulo_azul:.2f} ", (centroide_menor_azul[0], centroide_menor_azul[1] - 20), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (1, 1, 1), 2)
-
-            # Exibindo o frame com os ângulos e os vetores
-            cv2.imshow("Frame com Angulos e Vetores", frame)
-
-            # Imprimindo os ângulos no terminal
-            print("Angulo do Vermelho:", angulo_vermelho)
-            print("Angulo do Azul:", angulo_azul)
+        # Imprimindo os ângulos no terminal
+        print("Angulo do Vermelho:", angulo_vermelho)
+        print("Angulo do Azul:", angulo_azul)
 
         # Aferindo a posição dos marcadores vermelho e azul
         aferir_posicao(frame)
