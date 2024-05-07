@@ -60,7 +60,7 @@ def calcular_angulo(centroide_menor, centroide_maior):
     return angulo_deg
 
 # Carregando a imagem
-image = cv2.imread("testeeee.jpg")
+image = cv2.imread("testeee.jpg")
 
 # Encontrando o maior componente vermelho na imagem
 mask_maior_vermelho, maior_componente_vermelho, centroides_vermelhos = encontrar_maior_componente(image, 'vermelho')
@@ -76,11 +76,11 @@ angulo_azul = calcular_angulo(centroides_azuis[1], centroides_azuis[0])
 
 # Desenhando os centroides e os vetores na imagem original
 cv2.arrowedLine(image, centroides_vermelhos[1], centroides_vermelhos[0], (0, 0, 255), 2)
-cv2.putText(image, f"Vermelho: {angulo_vermelho:.2f} GRAUS", (centroides_vermelhos[0][0], centroides_vermelhos[0][1] - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+cv2.putText(image, f"Vermelho: {angulo_vermelho:.2f} ", (centroides_vermelhos[0][0], centroides_vermelhos[0][1] - 20), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (1, 1, 1), 2)
 cv2.arrowedLine(image, centroides_azuis[1], centroides_azuis[0], (255, 0, 0), 2)
-cv2.putText(image, f"Azul: {angulo_azul:.2f} GRAUS", (centroides_azuis[0][0], centroides_azuis[0][1] - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+cv2.putText(image, f"Azul: {angulo_azul:.2f} ", (centroides_azuis[0][0], centroides_azuis[0][1] - 20), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (1, 1, 1), 2)
 
 # Exibindo a imagem com os ângulos e os vetores
-cv2.imshow("Imagem com Ângulos e Vetores", image)
+cv2.imshow("Imagem com Angulos e Vetores", image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()

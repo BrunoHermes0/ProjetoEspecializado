@@ -8,7 +8,21 @@ image = cv2.imread('teste11.jpg')
 square_width = 91
 square_height = 95
 columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
-rows = range(1, 5)
+rows = range(1, 6)
+
+def draw_square_grid(image):
+    for i in range(len(rows)):
+        for j in range(len(columns)):
+            start_x = j * square_width
+            start_y = i * square_height
+            end_x = start_x + square_width
+            end_y = start_y + square_height
+            cv2.rectangle(image, (start_x, start_y), (end_x, end_y), (0, 255, 0), thickness=2)
+            # Adicionar letras para identificar as colunas
+            cv2.putText(image, columns[j], (start_x + 25, start_y + 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (1, 1, 1), 2)
+            # Adicionar números para identificar as linhas
+            cv2.putText(image, str(rows[i]), (start_x + 45, start_y + 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (1, 1, 1), 2)
+
 
 # Definir a função para converter coordenadas (x, y) em nome de região
 def coordenadas_para_regiao(x, y):
@@ -113,15 +127,17 @@ for x in range(0, image.shape[1], square_width):
 
 # Desenhar os marcadores dos centroides
 if centroide_azul:
-    cv2.drawMarker(image, centroide_azul, (255, 0, 0), cv2.MARKER_CROSS, 20, 2)
+    cv2.circle(image, centroide_azul, 5, (1, 1, 1), -1)
 if centroide_vermelho:
-    cv2.drawMarker(image, centroide_vermelho, (0, 0, 255), cv2.MARKER_CROSS, 20, 2)
+    cv2.circle(image, centroide_vermelho, 5, (1, 1, 1), -1)
 
 # Imprimir as coordenadas dos centroides
 if centroide_azul:
     print(f"AZUL: {coordenadas_centroide_azul}")
 if centroide_vermelho:
     print(f"VERMELHO: {coordenadas_centroide_vermelho}")
+
+#draw_square_grid(image)
 
 # Mostrar a imagem com os centroides e a grade de coordenadas
 cv2.imshow('Centroides e Grade de Coordenadas', image)
