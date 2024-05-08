@@ -108,6 +108,29 @@ def encontrar_maior_regiao(mask):
     
     return mask_maior_regiao
 
+def encontrar_menor_regiao(mask):
+    # Encontrar contornos na máscara
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    # Inicializar a menor área e o menor contorno
+    menor_area = float('inf')
+    menor_contorno = None
+    
+    # Percorrer todos os contornos encontrados
+    for contour in contours:
+        # Calcular a área do contorno
+        area = cv2.contourArea(contour)
+        # Se a área for menor que a menor área atual
+        if area < menor_area:
+            menor_area = area
+            menor_contorno = contour
+    
+    # Retornar a máscara da menor região
+    mask_menor_regiao = np.zeros_like(mask)
+    cv2.drawContours(mask_menor_regiao, [menor_contorno], -1, (255), thickness=cv2.FILLED)
+    
+    return mask_menor_regiao
+
 def calcular_centroide(mask):
     # Encontrar contornos na máscara
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -128,17 +151,16 @@ def calcular_centroide(mask):
     
     return centroide
 
-# Definir o tamanho dos quadrados e as letras para cada coluna
-square_width = 91
-square_height = 95
-columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
-rows = range(1, 5)
-
 # Definir a função para converter coordenadas (x, y) em nome de região
-def coordenadas_para_regiao(x, y):
-    coluna = columns[x // square_width]
-    linha = rows[y // square_height]
-    return f"{coluna}{linha}"
+def coordenadas_para_regiao(x1, y1, x2, y2):
+    coluna1 = columns[x1 // square_width]
+    linha1 = rows[y1 // square_height]
+    coluna2 = columns[x2 // square_width]
+    linha2 = rows[y2 // square_height]
+    if coluna1 == coluna2 and linha1 == linha2:              
+        return f"{coluna1}{linha1}"
+    else:
+        return f"Em movimento"
 
 # Função para aferir a posição dos marcadores vermelho e azul
 def aferir_posicao(frame):
@@ -152,14 +174,23 @@ def aferir_posicao(frame):
     # Encontrar a maior região azul
     maior_regiao_azul = encontrar_maior_regiao(blue_mask)
     
+    # Encontrar a menor região azul
+    menor_regiao_azul = encontrar_menor_regiao (blue_mask)
+    # Encontrar a menor região azul
+    menor_regiao_vermelha = encontrar_menor_regiao (red_mask)
+
     # Calcular os centroides da maior região vermelha e azul
     centroide_vermelho = calcular_centroide(maior_regiao_vermelha)
     centroide_azul = calcular_centroide(maior_regiao_azul)
     
-    # Converter as coordenadas dos centroides para as regiões correspondentes
-    coordenadas_centroide_vermelho = coordenadas_para_regiao(centroide_vermelho[0], centroide_vermelho[1]) if centroide_vermelho else None
-    coordenadas_centroide_azul = coordenadas_para_regiao(centroide_azul[0], centroide_azul[1]) if centroide_azul else None
-    
+    # Calcular os centroides da menor região azul e vermelha
+    centroide_azul_2 = calcular_centroide(menor_regiao_azul)
+    centroide_vermelho_2 = calcular_centroide(menor_regiao_vermelha)
+
+   # Converter as coordenadas dos centroides para as regiões correspondentes
+    coordenadas_centroide_azul = coordenadas_para_regiao(centroide_azul[0], centroide_azul[1],centroide_azul_2[0],centroide_azul_2[1])
+    coordenadas_centroide_vermelho = coordenadas_para_regiao(centroide_vermelho[0], centroide_vermelho[1],centroide_vermelho_2[0],centroide_vermelho_2[1])
+
     # Imprimir as coordenadas dos centroides
     if coordenadas_centroide_vermelho:
         print(f"Marcador Vermelho: {coordenadas_centroide_vermelho}")
@@ -170,6 +201,13 @@ def aferir_posicao(frame):
         print(f"Marcador Azul: {coordenadas_centroide_azul}")
     else:
         print("Nenhum marcador azul detectado")
+
+
+# Definir o tamanho dos quadrados e as letras para cada coluna
+square_width = 91
+square_height = 95
+columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+rows = range(1, 5)
 
 # Inicializando a captura de vídeo da câmera
 cap = cv2.VideoCapture(0)
