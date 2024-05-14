@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Carregar a imagem
-image = cv2.imread('teste14.jpg')
+image = cv2.imread('teste321.jpg')
 #image = cv2.imread('testeee.jpg')
 # Definir o tamanho dos quadrados e as letras para cada coluna
 square_width = 91
@@ -40,8 +40,8 @@ def detectar_vermelho(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     h = 1
     tolerance = 10
-    red_mask1 = np.array([h - tolerance, 100, 100])
-    red_mask2 = np.array([h + tolerance, 255, 255])
+    red_mask1 = np.array([h - tolerance, 100, 200])
+    red_mask2 = np.array([h + tolerance, 200, 255])
 
     # Criar uma máscara para a cor vermelha
     mask_vermelho = cv2.inRange(hsv, red_mask1, red_mask2)
