@@ -1,7 +1,17 @@
 import cv2
 import numpy as np
-import time as t
+import requests
 
+# Função para enviar os dados via POST para o web service
+def enviar_dados_para_webservice(posicao_carrinhoA, anguloA, posicao_carrinhoV, anguloV, ):
+    url = "http://192.168.88.203:8080/resumo"  # Substitua pela URL do seu web service
+    dados = {"pos_carA": posicao_carrinhoA, "ang_carA": anguloA, "pos_carV": posicao_carrinhoV, "ang_carV": anguloV}
+    resposta = requests.post(url, json=dados)
+    if resposta.status_code == 200:
+        print("Dados enviados com sucesso para o web service!")
+    else:
+        print("Falha ao enviar os dados para o web service:", resposta.status_code)
+        
 def encontrar_maior_componente(frame, cor):
     # Convertendo o frame para o espaço de cores HSV
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -143,6 +153,8 @@ while True:
             print(f"Marcador Azul: {coordenadas_centroide_azul}")
         else:
             print("Nenhum marcador azul detectado")  
+    
+    enviar_dados_para_webservice(coordenadas_centroide_azul, angulo_azul, coordenadas_centroide_vermelho, angulo_vermelho)
     
     # Esperando por 33 milissegundos (aproximadamente 30 frames por segundo) e verificando se a tecla 'q' foi pressionada para sair
     if cv2.waitKey(33) & 0xFF == ord('q'):
