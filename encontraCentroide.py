@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 
 # Carregar a imagem
-image = cv2.imread('teste14.jpg')
-#image = cv2.imread('testeee.jpg')
+#image = cv2.imread('teste14.jpg')
+image = cv2.imread('testeee.jpg')
 # Definir o tamanho dos quadrados e as letras para cada coluna
 square_width = 91
 square_height = 95
