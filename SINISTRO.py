@@ -4,7 +4,7 @@ import requests
 
 # Função para enviar os dados via POST para o web service
 def enviar_dados_para_webservice(posicao_carrinhoA, anguloA, posicao_carrinhoV, anguloV, ):
-    url = "http://192.168.88.203:8080/resumo"  # Substitua pela URL do seu web service
+    url = "http://150.162.206.197:8080/resumo"  # Substitua pela URL do seu web service
     dados = {"pos_carA": posicao_carrinhoA, "ang_carA": anguloA, "pos_carV": posicao_carrinhoV, "ang_carV": anguloV}
     resposta = requests.post(url, json=dados)
     if resposta.status_code == 200:
