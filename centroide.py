@@ -49,7 +49,7 @@ def detect_centroid(image):
     cv2.destroyAllWindows()
 
 # Carregar a imagem
-frame = cv2.imread('teste4.jpg')
+frame = cv2.imread('teste123.jpg')
 
 # Exibir a imagem
 cv2.imshow('Frame', frame)

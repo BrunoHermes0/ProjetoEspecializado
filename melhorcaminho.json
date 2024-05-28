@@ -1,0 +1,66 @@
+[
+    {
+        "coord": "A1",
+        "caminho": "A"  
+    },
+    {
+        "coord": "C1",
+        "caminho": "B"  
+    },
+    {
+        "coord": "E1",
+        "caminho": "C"  
+    },
+    {
+        "coord": "G1",
+        "caminho": "O"  
+    },
+    {
+        "coord": "B2",
+        "caminho": "D"  
+    },
+    {
+        "coord": "D2",
+        "caminho": "E"  
+    },
+    {
+        "coord": "F2",
+        "caminho": "F"  
+    },
+    {
+        "coord": "C3",
+        "caminho": "G"  
+    },
+    {
+        "coord": "E3",
+        "caminho": "H"  
+    },
+    {
+        "coord": "B4",
+        "caminho": "I"  
+    },
+    {
+        "coord": "D4",
+        "caminho": "J"  
+    },
+    {
+        "coord": "F4",
+        "caminho": "K"  
+    },
+    {
+        "coord": "A5",
+        "caminho": "P"  
+    },
+    {
+        "coord": "C5",
+        "caminho": "L"  
+    },
+    {
+        "coord": "E5",
+        "caminho": "M"  
+    },
+    {
+        "coord": "G5",
+        "caminho": "N"  
+    }
+]

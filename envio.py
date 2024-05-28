@@ -1,9 +1,12 @@
 import cv2
 import numpy as np
-import requests
+import requests     #envio
+
+coordenadas_centroide_vermelho=0    #envio 
+coordenadas_centroide_azul=0        #envio  
 
 # Função para enviar os dados via POST para o web service
-def enviar_dados_para_webservice(posicao_carrinhoA, anguloA, posicao_carrinhoV, anguloV, ):
+def enviar_dados_para_webservice(posicao_carrinhoA, anguloA, posicao_carrinhoV, anguloV):
     url = "http://192.168.88.203:8080/resumo"  # Substitua pela URL do seu web service
     dados = {"pos_carA": posicao_carrinhoA, "ang_carA": anguloA, "pos_carV": posicao_carrinhoV, "ang_carV": anguloV}
     resposta = requests.post(url, json=dados)
@@ -11,6 +14,8 @@ def enviar_dados_para_webservice(posicao_carrinhoA, anguloA, posicao_carrinhoV, 
         print("Dados enviados com sucesso para o web service!")
     else:
         print("Falha ao enviar os dados para o web service:", resposta.status_code)
+#envio ate aqui        
+        
         
 def encontrar_maior_componente(frame, cor):
     # Convertendo o frame para o espaço de cores HSV
@@ -18,7 +23,7 @@ def encontrar_maior_componente(frame, cor):
     
     # Definindo os intervalos de cor para a cor especificada em HSV
     if cor == 'vermelho':
-        lower_color = np.array([1, 100, 100])
+        lower_color = np.array([0, 100, 100])
         upper_color = np.array([11, 255, 255])
     elif cor == 'azul':
         lower_color = np.array([90, 100, 100])
@@ -70,22 +75,120 @@ def calcular_angulo(centroide_menor, centroide_maior):
     
     return angulo_deg
 
-# Definir a função para converter coordenadas (x, y) em nome de região
-def coordenadas_para_regiao(x1, y1, x2, y2):
-    coluna1 = columns[x1 // square_width]
-    linha1 = rows[y1 // square_height]
-    coluna2 = columns[x2 // square_width]
-    linha2 = rows[y2 // square_height]
-    if coluna1 == coluna2 and linha1 == linha2:              
-        return f"{coluna1}{linha1}"
-    else:
-        return f"Em movimento"
+def detectar_vermelho(frame):
+    # Converter o frame para o espaço de cores HSV
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
+    # Definir a faixa de cor vermelha em HSV
+    lower_red = np.array([0, 100, 100])
+    upper_red = np.array([10, 255, 255])
+    
+    # Criar uma máscara para a cor vermelha
+    mask = cv2.inRange(hsv, lower_red, upper_red)
+    
+    return mask
+
+def detectar_azul(frame):
+    # Converter o frame para o espaço de cores HSV
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    
+    # Definir a faixa de cor azul em HSV
+    lower_blue = np.array([110, 100, 100])
+    upper_blue = np.array([130, 255, 255])
+    
+    # Criar uma máscara para a cor azul
+    mask = cv2.inRange(hsv, lower_blue, upper_blue)
+    
+    return mask
+
+def encontrar_maior_regiao(mask):
+    # Encontrar contornos na máscara
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    # Inicializar a maior área e o maior contorno
+    maior_area = 0
+    maior_contorno = None
+    
+    # Percorrer todos os contornos encontrados
+    for contour in contours:
+        # Calcular a área do contorno
+        area = cv2.contourArea(contour)
+        # Se a área for maior que a maior área atual
+        if area > maior_area:
+            maior_area = area
+            maior_contorno = contour
+    
+    # Retornar a máscara da maior região
+    mask_maior_regiao = np.zeros_like(mask)
+    cv2.drawContours(mask_maior_regiao, [maior_contorno], -1, (255), thickness=cv2.FILLED)
+    
+    return mask_maior_regiao
+
+def calcular_centroide(mask):
+    # Encontrar contornos na máscara
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    # Inicializar o centroide
+    centroide = None
+    
+    # Se houver contornos encontrados
+    if contours:
+        # Calcular o momento do contorno
+        M = cv2.moments(contours[0])
+        
+        # Calcular o centroide
+        cx = int(M['m10'] / M['m00'])
+        cy = int(M['m01'] / M['m00'])
+        
+        centroide = (cx, cy)
+    
+    return centroide
+
 # Definir o tamanho dos quadrados e as letras para cada coluna
 square_width = 91
 square_height = 95
 columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
-rows = range(1, 6)
+rows = range(1, 5)
+
+# Definir a função para converter coordenadas (x, y) em nome de região
+def coordenadas_para_regiao(x, y):
+    coluna = columns[x // square_width]
+    linha = rows[y // square_height]
+    return f"{coluna}{linha}"
+
+# Função para aferir a posição dos marcadores vermelho e azul
+def aferir_posicao(frame):
+    global coordenadas_centroide_vermelho
+    global coordenadas_centroide_azul
+    
+    # Detectar a cor vermelha na imagem
+    red_mask = detectar_vermelho(frame)
+    # Detectar a cor azul na imagem
+    blue_mask = detectar_azul(frame)
+    
+    # Encontrar a maior região vermelha
+    maior_regiao_vermelha = encontrar_maior_regiao(red_mask)
+    # Encontrar a maior região azul
+    maior_regiao_azul = encontrar_maior_regiao(blue_mask)
+    
+    # Calcular os centroides da maior região vermelha e azul
+    centroide_vermelho = calcular_centroide(maior_regiao_vermelha)
+    centroide_azul = calcular_centroide(maior_regiao_azul)
+    
+    # Converter as coordenadas dos centroides para as regiões correspondentes
+    coordenadas_centroide_vermelho = coordenadas_para_regiao(centroide_vermelho[0], centroide_vermelho[1]) if centroide_vermelho else None
+    coordenadas_centroide_azul = coordenadas_para_regiao(centroide_azul[0], centroide_azul[1]) if centroide_azul else None
+    
+    # Imprimir as coordenadas dos centroides
+    if coordenadas_centroide_vermelho:
+        print(f"Marcador Vermelho: {coordenadas_centroide_vermelho}")
+    else:
+        print("Nenhum marcador vermelho detectado")
+        
+    if coordenadas_centroide_azul:
+        print(f"Marcador Azul: {coordenadas_centroide_azul}")
+    else:
+        print("Nenhum marcador azul detectado")
 
 # Inicializando a captura de vídeo da câmera
 cap = cv2.VideoCapture(0)
@@ -95,6 +198,7 @@ angulo_azul = 0
 frame_count = 0
 
 while True:
+    
     # Lendo o próximo frame da câmera
     ret, frame = cap.read()
     if not ret:
@@ -113,7 +217,7 @@ while True:
 
         # Calculando o ângulo entre os centroides vermelhos
         angulo_vermelho = calcular_angulo(centroides_vermelhos[1], centroides_vermelhos[0])
-        
+
         # Calculando o ângulo entre os centroides azuis
         angulo_azul = calcular_angulo(centroides_azuis[1], centroides_azuis[0])
 
@@ -130,36 +234,15 @@ while True:
         print("Angulo do Vermelho:", angulo_vermelho)
         print("Angulo do Azul:", angulo_azul)
 
-        x_azul1 = centroides_azuis[1][0]
-        y_azul1 = centroides_azuis[1][1]
-        x_azul2 = centroides_azuis[0][0]
-        y_azul2 = centroides_azuis[0][1]
+        # Aferindo a posição dos marcadores vermelho e azul
+        aferir_posicao(frame)
         
-        x_vermelho1 = centroides_vermelhos[1][0]
-        y_vermelho1 = centroides_vermelhos[1][1]
-        x_vermelho2 = centroides_vermelhos[0][0]
-        y_vermelho2 = centroides_vermelhos[0][1]
-        
-        coordenadas_centroide_azul = coordenadas_para_regiao(x_azul2,y_azul2,x_azul1,y_azul1)
-        coordenadas_centroide_vermelho = coordenadas_para_regiao(x_vermelho2,y_vermelho2,x_vermelho1,y_vermelho1)
-        
-        # Imprimir as coordenadas dos centroides
-        if coordenadas_centroide_vermelho:
-            print(f"Marcador Vermelho: {coordenadas_centroide_vermelho}")
-        else:
-            print("Nenhum marcador vermelho detectado")
-        
-        if coordenadas_centroide_azul:
-            print(f"Marcador Azul: {coordenadas_centroide_azul}")
-        else:
-            print("Nenhum marcador azul detectado")  
-    
-    enviar_dados_para_webservice(coordenadas_centroide_azul, angulo_azul, coordenadas_centroide_vermelho, angulo_vermelho)
+        enviar_dados_para_webservice(coordenadas_centroide_azul, angulo_azul, coordenadas_centroide_vermelho, angulo_vermelho)
     
     # Esperando por 33 milissegundos (aproximadamente 30 frames por segundo) e verificando se a tecla 'q' foi pressionada para sair
     if cv2.waitKey(33) & 0xFF == ord('q'):
         break
-
+    
 # Liberando os recursos e fechando todas as janelas
 cap.release()
 cv2.destroyAllWindows()

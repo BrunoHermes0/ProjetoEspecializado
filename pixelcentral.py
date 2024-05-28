@@ -2,13 +2,7 @@ import cv2
 import numpy as np
 
 # Carregar a imagem
-<<<<<<< HEAD
-#image = cv2.imread('teste14.jpg')
-image = cv2.imread('testeee.jpg')
-=======
-image = cv2.imread('teste321.jpg')
-#image = cv2.imread('testeee.jpg')
->>>>>>> ba4ecab46d92ae068265a81e4aecc0baac5c82a8
+image = cv2.imread('teste14.jpg')
 # Definir o tamanho dos quadrados e as letras para cada coluna
 square_width = 91
 square_height = 95
@@ -28,18 +22,17 @@ def draw_square_grid(image):
             # Adicionar números para identificar as linhas
             cv2.putText(image, str(rows[i]), (start_x + 45, start_y + 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (1, 1, 1), 2)
 
-
 # Definir a função para converter coordenadas (x, y) em nome de região
-def coordenadas_para_regiao(x1, y1, x2, y2):
-    coluna1 = columns[x1 // square_width]
-    linha1 = rows[y1 // square_height]
-    coluna2 = columns[x2 // square_width]
-    linha2 = rows[y2 // square_height]
+def coordenadas_para_regiao(x,y):
+    coluna1 = columns[x // square_width]
+    linha1 = rows[y // square_height]
+    
     if coluna1 == coluna2 and linha1 == linha2:              
         return f"{coluna1}{linha1}"
     else:
         return f"Em movimento"
-
+   
+        
 def detectar_vermelho(frame):
     # Converter o frame para o espaço de cores HSV
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -61,7 +54,7 @@ def detectar_azul(image):
     tolerance = 20
     blue_mask1 = np.array([h - tolerance, 100, 100])
     blue_mask2 = np.array([h + tolerance, 255, 255])
-    
+
     # Criar uma máscara para a cor azul
     mask_azul = cv2.inRange(hsv, blue_mask1, blue_mask2)
 
@@ -71,11 +64,11 @@ def detectar_azul(image):
 def encontrar_maior_regiao(mask):
     # Encontrar contornos na máscara
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
+
     # Inicializar a maior área e o maior contorno
     maior_area = 0
     maior_contorno = None
-    
+
     # Percorrer todos os contornos encontrados
     for contour in contours:
         # Calcular a área do contorno
@@ -84,21 +77,21 @@ def encontrar_maior_regiao(mask):
         if area > maior_area:
             maior_area = area
             maior_contorno = contour
-    
+
     # Retornar a máscara da maior região
     mask_maior_regiao = np.zeros_like(mask)
     cv2.drawContours(mask_maior_regiao, [maior_contorno], -1, (255), thickness=cv2.FILLED)
-    
+
     return mask_maior_regiao
 
 def encontrar_menor_regiao(mask):
     # Encontrar contornos na máscara
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
+
     # Inicializar a menor área e o menor contorno
     menor_area = float('inf')
     menor_contorno = None
-    
+
     # Percorrer todos os contornos encontrados
     for contour in contours:
         # Calcular a área do contorno
@@ -107,32 +100,32 @@ def encontrar_menor_regiao(mask):
         if area < menor_area:
             menor_area = area
             menor_contorno = contour
-    
+
     # Retornar a máscara da menor região
     mask_menor_regiao = np.zeros_like(mask)
     cv2.drawContours(mask_menor_regiao, [menor_contorno], -1, (255), thickness=cv2.FILLED)
-    
+
     return mask_menor_regiao
 
 # Função para calcular o centróide
 def calcular_centroide(mask):
     # Encontrar contornos na máscara
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
+
     # Inicializar o centroide
     centroide = None
-    
+
     # Se houver contornos encontrados
     if contours:
         # Calcular o momento do contorno
         M = cv2.moments(contours[0])
-        
-        # Calcular o centroide
+
+        # Calcular o centróide
         cx = int(M['m10'] / M['m00'])
         cy = int(M['m01'] / M['m00'])
-        
+
         centroide = (cx, cy)
-    
+
     return centroide
 
 # Detectar a cor azul e vermelha na imagem
@@ -145,9 +138,9 @@ maior_regiao_azul = encontrar_maior_regiao(blue_mask)
 maior_regiao_vermelha = encontrar_maior_regiao(red_mask)
 
 # Encontrar a menor região azul
-menor_regiao_azul = encontrar_menor_regiao (blue_mask)
-# Encontrar a menor região azul
-menor_regiao_vermelha = encontrar_menor_regiao (red_mask)
+menor_regiao_azul = encontrar_menor_regiao(blue_mask)
+# Encontrar a menor região vermelha
+menor_regiao_vermelha = encontrar_menor_regiao(red_mask)
 
 # Calcular os centroides da maior região azul e vermelha
 centroide_azul = calcular_centroide(maior_regiao_azul)
@@ -157,9 +150,16 @@ centroide_vermelho = calcular_centroide(maior_regiao_vermelha)
 centroide_azul_2 = calcular_centroide(menor_regiao_azul)
 centroide_vermelho_2 = calcular_centroide(menor_regiao_vermelha)
 
+# Calcular os pontos médios dos centroides azuis e vermelhos
+def calcular_ponto_medio(ponto1, ponto2):
+    return ((ponto1[0] + ponto2[0]) // 2, (ponto1[1] + ponto2[1]) // 2)
+
+ponto_medio_azul = calcular_ponto_medio(centroide_azul, centroide_azul_2)
+ponto_medio_vermelho = calcular_ponto_medio(centroide_vermelho, centroide_vermelho_2)
+
 # Converter as coordenadas dos centroides para as regiões correspondentes
-coordenadas_centroide_azul = coordenadas_para_regiao(centroide_azul[0], centroide_azul[1],centroide_azul_2[0],centroide_azul_2[1])
-coordenadas_centroide_vermelho = coordenadas_para_regiao(centroide_vermelho[0], centroide_vermelho[1],centroide_vermelho_2[0],centroide_vermelho_2[1])
+coordenadas_centroide_azul = coordenadas_para_regiao(ponto_medio_azul[0],ponto_medio_azul[1])
+coordenadas_centroide_vermelho = coordenadas_para_regiao(ponto_medio_vermelho[0],ponto_medio_vermelho[1])
 
 # Desenhar a grade de coordenadas
 for y in range(0, image.shape[0], square_height):
@@ -169,23 +169,24 @@ for x in range(0, image.shape[1], square_width):
 
 # Desenhar os marcadores dos centroides
 if centroide_azul:
-    cv2.circle(image, centroide_azul, 5, (1, 1, 1), -1)
+    cv2.circle(image, centroide_azul, 5, (255, 0, 0), -1)
 if centroide_vermelho:
-    cv2.circle(image, centroide_vermelho, 5, (1, 1, 1), -1)
+    cv2.circle(image, centroide_vermelho, 5, (0, 0, 255), -1)
 # Desenhar os marcadores dos centroides da menor região
 if centroide_azul_2:
-    cv2.circle(image, centroide_azul_2, 5, (1, 1, 1), -1)
+    cv2.circle(image, centroide_azul_2, 5, (255, 0, 0), -1)
 if centroide_vermelho_2:
-    cv2.circle(image, centroide_vermelho_2, 5, (1, 1, 1), -1)
+    cv2.circle(image, centroide_vermelho_2, 5, (0, 0, 255), -1)
 
+# Desenhar os pontos médios
+cv2.circle(image, ponto_medio_azul, 5, (1, 1, 1), -1)
+cv2.circle(image, ponto_medio_vermelho, 5, (1, 1, 1), -1)
 
 # Imprimir as coordenadas dos centroides
 if centroide_azul:
     print(f"AZUL: {coordenadas_centroide_azul}")
 if centroide_vermelho:
     print(f"VERMELHO: {coordenadas_centroide_vermelho}")
-
-#draw_square_grid(image)
 
 # Mostrar a imagem com os centroides e a grade de coordenadas
 cv2.imshow('Centroides e Grade de Coordenadas', image)
