@@ -2,7 +2,8 @@ import cv2
 import numpy as np
 import requests
 
-posicao_aux = None
+posicaoAzul = None
+posicaoVermelho = None
 
 # Função para enviar os dados via POST para o web service
 def enviar_dados_para_webservice(posicao_carrinhoA, anguloA, posicao_carrinhoV, anguloV):
@@ -73,8 +74,8 @@ def calcular_angulo(centroide_menor, centroide_maior):
     return angulo_deg
 
 # Definir a função para converter coordenadas (x, y) em nome de região
-def coordenadas_para_regiao(x, y):
-    global posicao_aux
+def coordenadas_para_regiao_azul(x, y):
+    global posicaoAzul
     coluna = columns[x // square_width]
     linha = rows[y // square_height]
 
@@ -84,10 +85,26 @@ def coordenadas_para_regiao(x, y):
 
     # Verificar se o ponto está dentro da região central de 20x20 pixels
     if (centro_x - 10 <= x <= centro_x + 10) and (centro_y - 10 <= y <= centro_y + 10):
-        posicao_aux = f"{coluna}{linha}"
-        return posicao_aux
+        posicaoAzul = f"{coluna}{linha}"
+        return posicaoAzul
     else:
-        return posicao_aux
+        return posicaoAzul
+    
+def coordenadas_para_regiao_vermelho(x, y):
+    global posicaoVermelho
+    coluna = columns[x // square_width]
+    linha = rows[y // square_height]
+
+    # Calcular as coordenadas do centro da região
+    centro_x = (x // square_width) * square_width + square_width // 2
+    centro_y = (y // square_height) * square_height + square_height // 2
+
+    # Verificar se o ponto está dentro da região central de 20x20 pixels
+    if (centro_x - 10 <= x <= centro_x + 10) and (centro_y - 10 <= y <= centro_y + 10):
+        posicaoVermelho = f"{coluna}{linha}"
+        return posicaoVermelho
+    else:
+        return posicaoVermelho
     
 def calcular_ponto_medio(ponto1, ponto2):
     return ((ponto1[0] + ponto2[0]) // 2, (ponto1[1] + ponto2[1]) // 2)
@@ -155,10 +172,9 @@ while True:
         ponto_medio_vermelho = calcular_ponto_medio(centroides_vermelhos[1], centroides_vermelhos[0])
 
         # Converter as coordenadas dos centroides para as regiões correspondentes
-        coordenadas_centroide_azul = coordenadas_para_regiao(ponto_medio_azul[0], ponto_medio_azul[1])
+        coordenadas_centroide_azul = coordenadas_para_regiao_azul(ponto_medio_azul[0], ponto_medio_azul[1])
        
-             
-        coordenadas_centroide_vermelho = coordenadas_para_regiao(ponto_medio_vermelho[0], ponto_medio_vermelho[1])
+        coordenadas_centroide_vermelho = coordenadas_para_regiao_vermelho(ponto_medio_vermelho[0], ponto_medio_vermelho[1])
         
         # Imprimir as coordenadas dos centroides
         if coordenadas_centroide_vermelho:
