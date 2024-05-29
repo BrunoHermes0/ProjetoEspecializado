@@ -503,6 +503,74 @@ dados_json2 = [
 
 ###################################################################
 
+dados_json3 =[
+    {
+        "coord": "A1",
+        "caminho": "A"  
+    },
+    {
+        "coord": "C1",
+        "caminho": "B"  
+    },
+    {
+        "coord": "E1",
+        "caminho": "C"  
+    },
+    {
+        "coord": "G1",
+        "caminho": "O"  
+    },
+    {
+        "coord": "B2",
+        "caminho": "D"  
+    },
+    {
+        "coord": "D2",
+        "caminho": "E"  
+    },
+    {
+        "coord": "F2",
+        "caminho": "F"  
+    },
+    {
+        "coord": "C3",
+        "caminho": "G"  
+    },
+    {
+        "coord": "E3",
+        "caminho": "H"  
+    },
+    {
+        "coord": "B4",
+        "caminho": "I"  
+    },
+    {
+        "coord": "D4",
+        "caminho": "J"  
+    },
+    {
+        "coord": "F4",
+        "caminho": "K"  
+    },
+    {
+        "coord": "A5",
+        "caminho": "P"  
+    },
+    {
+        "coord": "C5",
+        "caminho": "L"  
+    },
+    {
+        "coord": "E5",
+        "caminho": "M"  
+    },
+    {
+        "coord": "G5",
+        "caminho": "N"  
+    }
+]
+
+##################################################################
 dados_json = [
     {
         "origem": "A1",
@@ -788,6 +856,26 @@ def encontrar_angulo_referencia(origem, destino):
             return item['angulo']
     return None  # Retorna None se não encontrar correspondência
 
+def posicao_intermed(inic, fin):
+    for item in dados_json2:
+        if item['atual'] == inic and item['proxima'] == fin:
+            return item['atual'], item['intermed']
+    return None # Retorna None se não encontrar correspondência
+
+def checa_menor_caminho(inicio, fim):
+    caminho_inicio = None
+    caminho_fim = None
+
+    for item in dados_json3:
+        if item['coord'] == inicio:
+            caminho_inicio = item['caminho']
+        if item['coord'] == fim:
+            caminho_fim = item['caminho']
+
+    if caminho_inicio is not None and caminho_fim is not None:
+        return caminho_inicio, caminho_fim, 1
+    else:
+        return inicio, fim, 0
 
 @app.route('/calcular_caminho', methods=['POST'])
 def calcular_caminho():
@@ -802,8 +890,8 @@ def calcular_caminho():
     data = request.json
     print(data)
     # Extrair parâmetros do JSON enviado pelo server.js
-    inicio = data.get('posicao_atual')
-    fim = data.get('positionCode')
+    inicio1 = data.get('posicao_atual')
+    fim1 = data.get('positionCode')
     lugares_bloqueados = data.get('caminho_bloqueado')
     prioridadeSTR = data.get('priority')
     posicao_anterior = data.get('posicao_anterior')
@@ -831,59 +919,70 @@ def calcular_caminho():
         prioridade = 0
     resultado = {"erro": "não consegui entrar nas condicoes"}
 
-    [dist1, caminho1] = encontrar_menor_caminho(grafo, inicio, fim, posicao_anterior)
-    print("prints da função encontrar_menor_caminho-------------")
-    print(dist1)
-    print(caminho1)
-    print("------------")
-    if IdE == 1:
-        if len(caminho1)>1:
-            caminho_proximo_emp1 = caminho1[1]
-            print(caminho_proximo_emp1)
+    inicio, fim, checagem = checa_menor_caminho(inicio1, fim1)
 
-        else:
-            caminho_proximo_emp1 = caminho1[0]
-            print(caminho_proximo_emp1)
-
-        dist_1 = dist1
-        print("DADOS DA EMPI 1:")
-        print(dist_1)
-        print(dist_2)
-        print(caminho1)
-        print(caminho_proximo_emp2)
-        print(posicao_anterior)
-        prioridade1 = prioridadeR
-
-        resultado = encontrar_e_navegar(inicio, fim, lugares_bloqueados, prioridade, dist_1, dist_2, caminho1, caminho_proximo_emp2, IdE, posicao_anterior)
-    if IdE == 2:
-        if len(caminho1)>1:
-            caminho_proximo_emp2 = caminho1[1]
-            print(caminho_proximo_emp2)
-        else:
-            caminho_proximo_emp2 = caminho1[0]
-            print(caminho_proximo_emp2)
-
-        dist_2 = dist1
-        print("DADOS DA EMPI 2:")
+    if(checagem == 1):
+        [dist1, caminho1] = encontrar_menor_caminho(grafo, inicio, fim, posicao_anterior)
+        print("prints da função encontrar_menor_caminho-------------")
         print(dist1)
-        print(dist_1)
         print(caminho1)
-        print(caminho_proximo_emp1)
-        print(posicao_anterior)
-        prioridade2 = prioridadeR
+        print("------------")
+        if IdE == 1:
+            if len(caminho1)>1:
+                caminho_proximo_emp1 = caminho1[1]
+                print(caminho_proximo_emp1)
 
-        resultado = encontrar_e_navegar(inicio, fim, lugares_bloqueados, prioridade, dist1, dist_1, caminho1, caminho_proximo_emp1, IdE, posicao_anterior)
+            else:
+                caminho_proximo_emp1 = caminho1[0]
+                print(caminho_proximo_emp1)
 
-    # Retornar resultados como JSON para o server.js
-    print("Resultado------>")
-    #resultado["caminho_completo"] = list(resultado["caminho_completo"])
+            dist_1 = dist1
+            print("DADOS DA EMPI 1:")
+            print(dist_1)
+            print(dist_2)
+            print(caminho1)
+            print(caminho_proximo_emp2)
+            print(posicao_anterior)
+            prioridade1 = prioridadeR
 
-    atual,proxima = posicao_intermed(inicio,)
+            resultado = encontrar_e_navegar(inicio, fim, lugares_bloqueados, prioridade, dist_1, dist_2, caminho1, caminho_proximo_emp2, IdE, posicao_anterior)
+        if IdE == 2:
+            if len(caminho1)>1:
+                caminho_proximo_emp2 = caminho1[1]
+                print(caminho_proximo_emp2)
+            else:
+                caminho_proximo_emp2 = caminho1[0]
+                print(caminho_proximo_emp2)
 
-    angulo_referencia = encontrar_angulo_referencia(atual, proxima)
-    print(resultado)
-    return resultado
+            dist_2 = dist1
+            print("DADOS DA EMPI 2:")
+            print(dist1)
+            print(dist_1)
+            print(caminho1)
+            print(caminho_proximo_emp1)
+            print(posicao_anterior)
+            prioridade2 = prioridadeR
 
+            resultado = encontrar_e_navegar(inicio, fim, lugares_bloqueados, prioridade, dist1, dist_1, caminho1, caminho_proximo_emp1, IdE, posicao_anterior)
+
+        # Retornar resultados como JSON para o server.js
+        print("Resultado------>")
+        #resultado["caminho_completo"] = list(resultado["caminho_completo"])
+
+        ################### dest --- falta pegar do resultado ###################
+        atual,prox = posicao_intermed(inicio,dest)
+
+        angulo_referencia = encontrar_angulo_referencia(atual, prox)
+
+        print(resultado)
+        return resultado
+    else:
+        ################### dest --- falta pegar do resultado ###################
+        atual,prox = posicao_intermed(inicio,dest)
+
+        angulo_referencia = encontrar_angulo_referencia(atual, prox)
+        ################### nao sei oq retorna aqui ###################
+        return None
     #return jsonify(resultado)
 
 
