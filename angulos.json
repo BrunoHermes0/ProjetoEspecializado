@@ -1,0 +1,277 @@
+[
+    {
+        "origem": "A1",
+        "destino": "B1",
+        "angulo": 0
+    },
+    {
+        "origem": "A5",
+        "destino": "B5",
+        "angulo": 0
+    },
+    {
+        "origem": "B1",
+        "destino": "A1",
+        "angulo": 180
+    },
+    {
+        "origem": "B1",
+        "destino": "B2",
+        "angulo": 90
+    },
+    {
+        "origem": "B1",
+        "destino": "C1",
+        "angulo": 0
+    },
+    {
+        "origem": "B2",
+        "destino": "B1",
+        "angulo": 270
+    },
+    {
+        "origem": "B2",
+        "destino": "B3",
+        "angulo": 90
+    },
+    {
+        "origem": "B3",
+        "destino": "B2",
+        "angulo": 270
+    },
+    {
+        "origem": "B3",
+        "destino": "B4",
+        "angulo": 90
+    },
+    {
+        "origem": "B3",
+        "destino": "C3",
+        "angulo": 0
+    },
+    {
+        "origem": "B4",
+        "destino": "B3",
+        "angulo": 270
+    },
+    {
+        "origem": "B4",
+        "destino": "B5",
+        "angulo": 90
+    },
+    {
+        "origem": "B5",
+        "destino": "A5",
+        "angulo": 180
+    },
+    {
+        "origem": "B5",
+        "destino": "C5",
+        "angulo": 0
+    },
+    {
+        "origem": "B5",
+        "destino": "B4",
+        "angulo": 270
+    },
+    {
+        "origem": "C1",
+        "destino": "B1",
+        "angulo": 180
+    },
+    {
+        "origem": "C1",
+        "destino": "D1",
+        "angulo": 0
+    },
+    {
+        "origem": "C3",
+        "destino": "B3",
+        "angulo": 180
+    },
+    {
+        "origem": "C3",
+        "destino": "D3",
+        "angulo": 0
+    },
+    {
+        "origem": "C5",
+        "destino": "B5",
+        "angulo": 180
+    },
+    {
+        "origem": "C5",
+        "destino": "D5",
+        "angulo": 0
+    },
+    {
+        "origem": "D1",
+        "destino": "C1",
+        "angulo": 180
+    },
+    {
+        "origem": "D1",
+        "destino": "D2",
+        "angulo": 90
+    },
+    {
+        "origem": "D1",
+        "destino": "E1",
+        "angulo": 0
+    },
+    {
+        "origem": "D2",
+        "destino": "D1",
+        "angulo": 270
+    },
+    {
+        "origem": "D2",
+        "destino": "D3",
+        "angulo": 90
+    },
+    {
+        "origem": "D3",
+        "destino": "D2",
+        "angulo": 270
+    },
+    {
+        "origem": "D3",
+        "destino": "E3",
+        "angulo": 0
+    },
+    {
+        "origem": "D3",
+        "destino": "D4",
+        "angulo": 90
+    },
+    {
+        "origem": "D3",
+        "destino": "C3",
+        "angulo": 180
+    },
+    {
+        "origem": "D4",
+        "destino": "D3",
+        "angulo": 270
+    },
+    {
+        "origem": "D4",
+        "destino": "D5",
+        "angulo": 90
+    },
+    {
+        "origem": "D5",
+        "destino": "C5",
+        "angulo": 180
+    },
+    {
+        "origem": "D5",
+        "destino": "E5",
+        "angulo": 0
+    },
+    {
+        "origem": "E1",
+        "destino": "D1",
+        "angulo": 180
+    },
+    {
+        "origem": "E1",
+        "destino": "F1",
+        "angulo": 0
+    },
+    {
+        "origem": "E3",
+        "destino": "D3",
+        "angulo": 180
+    },
+    {
+        "origem": "E3",
+        "destino": "F3",
+        "angulo": 0
+    },
+    {
+        "origem": "E5",
+        "destino": "D5",
+        "angulo": 180
+    },
+    {
+        "origem": "E5",
+        "destino": "F5",
+        "angulo": 0
+    },
+    {
+        "origem": "F1",
+        "destino": "E1",
+        "angulo": 180
+    },
+    {
+        "origem": "F1",
+        "destino": "F2",
+        "angulo": 90
+    },
+    {
+        "origem": "F1",
+        "destino": "G1",
+        "angulo": 0
+    },
+    {
+        "origem": "F2",
+        "destino": "F1",
+        "angulo": 270
+    },
+    {
+        "origem": "F2",
+        "destino": "F3",
+        "angulo": 90
+    },
+    {
+        "origem": "F3",
+        "destino": "F2",
+        "angulo": 270
+    },
+    {
+        "origem": "F3",
+        "destino": "F4",
+        "angulo": 90
+    },
+    {
+        "origem": "F3",
+        "destino": "E3",
+        "angulo": 180
+    },
+    {
+        "origem": "F4",
+        "destino": "F3",
+        "angulo": 270
+    },
+    {
+        "origem": "F4",
+        "destino": "F5",
+        "angulo": 90
+    },
+    {
+        "origem": "F5",
+        "destino": "E5",
+        "angulo": 180
+    },
+    {
+        "origem": "F5",
+        "destino": "G5",
+        "angulo": 0
+    },
+    {
+        "origem": "F5",
+        "destino": "F4",
+        "angulo": 270
+    },
+    {
+        "origem": "G1",
+        "destino": "F1",
+        "angulo": 180
+    },
+    {
+        "origem": "G5",
+        "destino": "F5",
+        "angulo": 180
+    }
+]

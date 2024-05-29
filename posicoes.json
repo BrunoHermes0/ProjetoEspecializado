@@ -1,0 +1,448 @@
+[
+    {
+        "atual": "A1",
+        "intermed": "B1",
+        "proxima": "B2"
+    },
+    {
+        "atual": "A1",
+        "intermed": "B1",
+        "proxima": "C1"
+    },
+    {
+        "atual": "B1",
+        "intermed": "A1",
+        "proxima": "A1"
+    },
+    {
+        "atual": "B1",
+        "intermed": "B2",
+        "proxima": "B2"
+    },
+    {
+        "atual": "B1",
+        "intermed": "C1",
+        "proxima": "C1"
+    },
+    {
+        "atual": "C1",
+        "intermed": "B1",
+        "proxima": "A1"
+    },
+    {
+        "atual": "C1",
+        "intermed": "B1",
+        "proxima": "B2"
+    },
+    {
+        "atual": "C1",
+        "intermed": "D1",
+        "proxima": "E1"
+    },
+    {
+        "atual": "C1",
+        "intermed": "D1",
+        "proxima": "D2"
+    },
+    {
+        "atual": "D1",
+        "intermed": "C1",
+        "proxima": "C1"
+    },
+    {
+        "atual": "D1",
+        "intermed": "D2",
+        "proxima": "D2"
+    },
+    {
+        "atual": "D1",
+        "intermed": "E1",
+        "proxima": "E1"
+    },
+    {
+        "atual": "E1",
+        "intermed": "D1",
+        "proxima": "C1"
+    },
+    {
+        "atual": "E1",
+        "intermed": "D1",
+        "proxima": "D2"
+    },
+    {
+        "atual": "E1",
+        "intermed": "F1",
+        "proxima": "G1"
+    },
+    {
+        "atual": "E1",
+        "intermed": "F1",
+        "proxima": "F2"
+    },
+    {
+        "atual": "F1",
+        "intermed": "E1",
+        "proxima": "E1"
+    },
+    {
+        "atual": "F1",
+        "intermed": "F2",
+        "proxima": "F2"
+    },
+    {
+        "atual": "F1",
+        "intermed": "G1",
+        "proxima": "G1"
+    },
+    {
+        "atual": "G1",
+        "intermed": "F1",
+        "proxima": "E1"
+    },
+    {
+        "atual": "G1",
+        "intermed": "F1",
+        "proxima": "F2"
+    },
+    {
+        "atual": "B2",
+        "intermed": "B1",
+        "proxima": "A1"
+    },
+    {
+        "atual": "B2",
+        "intermed": "B1",
+        "proxima": "C1"
+    },
+    {
+        "atual": "B2",
+        "intermed": "B3",
+        "proxima": "C3"
+    },
+    {
+        "atual": "B2",
+        "intermed": "B3",
+        "proxima": "B4"
+    },
+    {
+        "atual": "D2",
+        "intermed": "D1",
+        "proxima": "C1"
+    },
+    {
+        "atual": "D2",
+        "intermed": "D1",
+        "proxima": "E1"
+    },
+    {
+        "atual": "D2",
+        "intermed": "D3",
+        "proxima": "C3"
+    },
+    {
+        "atual": "D2",
+        "intermed": "D3",
+        "proxima": "D4"
+    },
+    {
+        "atual": "D2",
+        "intermed": "D3",
+        "proxima": "E3"
+    },
+    {
+        "atual": "F2",
+        "intermed": "F1",
+        "proxima": "E1"
+    },
+    {
+        "atual": "F2",
+        "intermed": "F1",
+        "proxima": "G1"
+    },
+    {
+        "atual": "F2",
+        "intermed": "F3",
+        "proxima": "E3"
+    },
+    {
+        "atual": "F2",
+        "intermed": "F3",
+        "proxima": "F4"
+    },
+    {
+        "atual": "B3",
+        "intermed": "B2",
+        "proxima": "B2"
+    },
+    {
+        "atual": "B3",
+        "intermed": "C3",
+        "proxima": "C3"
+    },
+    {
+        "atual": "B3",
+        "intermed": "B4",
+        "proxima": "B4"
+    },
+    {
+        "atual": "C3",
+        "intermed": "B3",
+        "proxima": "B2"
+    },
+    {
+        "atual": "C3",
+        "intermed": "B3",
+        "proxima": "B4"
+    },
+    {
+        "atual": "C3",
+        "intermed": "D3",
+        "proxima": "D2"
+    },
+    {
+        "atual": "C3",
+        "intermed": "D3",
+        "proxima": "E3"
+    },
+    {
+        "atual": "C3",
+        "intermed": "D3",
+        "proxima": "D4"
+    },
+    {
+        "atual": "D3",
+        "intermed": "C3",
+        "proxima": "C3"
+    },
+    {
+        "atual": "D3",
+        "intermed": "D2",
+        "proxima": "D2"
+    },
+    {
+        "atual": "D3",
+        "intermed": "E3",
+        "proxima": "E3"
+    },
+    {
+        "atual": "D3",
+        "intermed": "D4",
+        "proxima": "D4"
+    },
+    {
+        "atual": "E3",
+        "intermed": "D3",
+        "proxima": "D2"
+    },
+    {
+        "atual": "E3",
+        "intermed": "D3",
+        "proxima": "C3"
+    },
+    {
+        "atual": "E3",
+        "intermed": "D3",
+        "proxima": "D4"
+    },
+    {
+        "atual": "E3",
+        "intermed": "F3",
+        "proxima": "F2"
+    },
+    {
+        "atual": "E3",
+        "intermed": "F3",
+        "proxima": "F4"
+    },
+    {
+        "atual": "F3",
+        "intermed": "F2",
+        "proxima": "F2"
+    },
+    {
+        "atual": "F3",
+        "intermed": "E3",
+        "proxima": "E3"
+    },
+    {
+        "atual": "F3",
+        "intermed": "F4",
+        "proxima": "F4"
+    },
+    {
+        "atual": "B4",
+        "intermed": "B3",
+        "proxima": "B2"
+    },
+    {
+        "atual": "B4",
+        "intermed": "B3",
+        "proxima": "C3"
+    },
+    {
+        "atual": "B4",
+        "intermed": "B5",
+        "proxima": "A5"
+    },
+    {
+        "atual": "B4",
+        "intermed": "B5",
+        "proxima": "C5"
+    },
+    {
+        "atual": "D4",
+        "intermed": "D3",
+        "proxima": "C3"
+    },
+    {
+        "atual": "D4",
+        "intermed": "D3",
+        "proxima": "D2"
+    },
+    {
+        "atual": "D4",
+        "intermed": "D3",
+        "proxima": "E3"
+    },
+    {
+        "atual": "D4",
+        "intermed": "D5",
+        "proxima": "C5"
+    },
+    {
+        "atual": "D4",
+        "intermed": "D5",
+        "proxima": "E5"
+    },
+    {
+        "atual": "F4",
+        "intermed": "F3",
+        "proxima": "E3"
+    },
+    {
+        "atual": "F4",
+        "intermed": "F3",
+        "proxima": "F2"
+    },
+    {
+        "atual": "F4",
+        "intermed": "F5",
+        "proxima": "E5"
+    },
+    {
+        "atual": "F4",
+        "intermed": "F5",
+        "proxima": "G5"
+    },
+    {
+        "atual": "A5",
+        "intermed": "B5",
+        "proxima": "B4"
+    },
+    {
+        "atual": "A5",
+        "intermed": "B5",
+        "proxima": "C5"
+    },
+    {
+        "atual": "B5",
+        "intermed": "A5",
+        "proxima": "A5"
+    },
+    {
+        "atual": "B5",
+        "intermed": "B4",
+        "proxima": "B4"
+    },
+    {
+        "atual": "B5",
+        "intermed": "C5",
+        "proxima": "C5"
+    },
+    {
+        "atual": "C5",
+        "intermed": "B5",
+        "proxima": "A5"
+    },
+    {
+        "atual": "C5",
+        "intermed": "B5",
+        "proxima": "B4"
+    },
+    {
+        "atual": "C5",
+        "intermed": "D5",
+        "proxima": "D4"
+    },
+    {
+        "atual": "C5",
+        "intermed": "D5",
+        "proxima": "E5"
+    },
+    {
+        "atual": "D5",
+        "intermed": "C5",
+        "proxima": "C5"
+    },
+    {
+        "atual": "D5",
+        "intermed": "D4",
+        "proxima": "D4"
+    },
+    {
+        "atual": "D5",
+        "intermed": "E5",
+        "proxima": "E5"
+    },
+    {
+        "atual": "E5",
+        "intermed": "D5",
+        "proxima": "C5"
+    },
+    {
+        "atual": "E5",
+        "intermed": "D5",
+        "proxima": "D4"
+    },
+    {
+        "atual": "E5",
+        "intermed": "F5",
+        "proxima": "F4"
+    },
+    {
+        "atual": "E5",
+        "intermed": "F5",
+        "proxima": "G5"
+    },
+    {
+        "atual": "F5",
+        "intermed": "E5",
+        "proxima": "E5"
+    },
+    {
+        "atual": "F5",
+        "intermed": "F4",
+        "proxima": "F4"
+    },
+    {
+        "atual": "F5",
+        "intermed": "G5",
+        "proxima": "G5"
+    },
+    {
+        "atual": "G5",
+        "intermed": "F5",
+        "proxima": "E5"
+    },
+    {
+        "atual": "G5",
+        "intermed": "F5",
+        "proxima": "F4"
+    }
+]
+
+
+
+
+
+
