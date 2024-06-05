@@ -188,7 +188,7 @@ while True:
             print("Nenhum marcador azul detectado")  
     
     #REVER 
-    #enviar_dados_para_webservice(coordenadas_centroide_azul, angulo_azul, coordenadas_centroide_vermelho, angulo_vermelho)
+    enviar_dados_para_webservice(coordenadas_centroide_azul, angulo_azul, coordenadas_centroide_vermelho, angulo_vermelho)
     
     # Esperando por 33 milissegundos (aproximadamente 30 frames por segundo) e verificando se a tecla 'q' foi pressionada para sair
     if cv2.waitKey(33) & 0xFF == ord('q'):

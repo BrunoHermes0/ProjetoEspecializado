@@ -3,7 +3,7 @@ import heapq
 import json
 from flask_cors import CORS  # Importe o módulo CORS
 
-app = Flask(__name__)
+app = Flask(_name_)
 CORS(app)  # Adicione esta linha para habilitar o CORS
 # Definir um grafo ponderado das posições no estoque
 grafo = {
@@ -29,6 +29,25 @@ grafo = {
 a = "Siga reto"
 b = "Vire a direita"
 c = "Vire a esquerda"
+
+
+P = 0 
+I = 0
+D = 0   
+# Parâmetros do sistema 
+Kp = 2.2  # Ganho proporcional 1.2
+Ki = 0.0  # Ganho integral0.00002
+Kd = 0.5 # Ganho derivativo 0.9
+aux = 0
+lastError = 0 
+beta = 0
+posicao_anterior = 0
+basespeeda = 170
+basespeedb = 170
+maxspeeda = 230  # Máxima velocidade roda a
+maxspeedb = 230  # Máxima velocidade roda b   
+pid = []
+error = []
 
 # Dicionário de mapeamento de instruções de movimento
 instrucoes_movimento = {
@@ -501,9 +520,7 @@ dados_json2 = [
     }
 ]
 
-###################################################################
-
-dados_json3 =[
+dados_json3 = [
     {
         "coord": "A1",
         "caminho": "A"  
@@ -570,7 +587,8 @@ dados_json3 =[
     }
 ]
 
-##################################################################
+
+
 dados_json = [
     {
         "origem": "A1",
@@ -856,6 +874,135 @@ def encontrar_angulo_referencia(origem, destino):
             return item['angulo']
     return None  # Retorna None se não encontrar correspondência
 
+
+@app.route('/calcular_caminho', methods=['POST'])
+def calcular_caminho():
+    global dist_2  # Declare dist_2 como uma variável global
+    global dist_1 # Declare dist_2 como uma variável global
+    global caminho_proximo_emp1  # Declare dist_2 como uma variável global
+    global caminho_proximo_emp2  # Declare dist_2 como uma variável global
+    global prioridade1
+    global prioridade2
+    global angulo_atual
+    proxima_posicao = " "
+    data = request.json
+    print("-------------------DADOS RECEBIDOS DO SERVIDOR NODE JS------------------------")
+    
+    print(data)
+    print("-------------------------------------------")
+    # Extrair parâmetros do JSON enviado pelo server.js
+    inicio1 = data.get('posicao_atual')
+    fim1 = data.get('positionCode')
+    lugares_bloqueados = data.get('caminho_bloqueado')
+    prioridadeSTR = data.get('priority')
+    posicao_anterior = data.get('posicao_anterior')
+    IdESTR = data.get('forkliftNumber',0)
+    angulo_atual = data.get('angulo_car')
+    
+    
+
+    #resultado = []
+    IdE = int(IdESTR)
+    #print("ID:----------------------")
+    #print(IdE)
+    #print(type(IdE))
+    #print(repr(IdE))
+    prioridadeR = int(prioridadeSTR)
+    #print((prioridadeR))
+    #print("LUGARES BLOQUEADOS--------")
+    #print(lugares_bloqueados)
+
+    if prioridade1 > prioridade2:
+        prioridade = 1
+    elif prioridade1 < prioridade2:
+        prioridade = 2
+    else:
+        prioridade = 0
+    resultado = {"erro": "não consegui entrar nas condicoes"}
+
+    inicio, fim, checagem = checa_menor_caminho(inicio1, fim1)
+    
+    if(checagem == 1):
+        [dist1, caminho1] = encontrar_menor_caminho(grafo, inicio, fim, posicao_anterior)
+        #print("prints da função encontrar_menor_caminho-------------")
+        #print(dist1)
+        #print(caminho1)
+        #print("------------")
+        if IdE == 1:
+            if len(caminho1)>1:
+                caminho_proximo_emp1 = caminho1[1]
+                print(caminho_proximo_emp1)
+
+            else:
+                caminho_proximo_emp1 = caminho1[0]
+                print(caminho_proximo_emp1)
+
+            dist_1 = dist1
+            #print("DADOS DA EMPI 1:")
+            #print(dist_1)
+            #print(dist_2)
+            #print(caminho1)
+            #print(caminho_proximo_emp2)
+            #print(posicao_anterior)
+            prioridade1 = prioridadeR
+
+            resultado = encontrar_e_navegar(inicio, fim, lugares_bloqueados, prioridade, dist_1, dist_2, caminho1, caminho_proximo_emp2, IdE, posicao_anterior)
+        if IdE == 2:
+            if len(caminho1)>1:
+                caminho_proximo_emp2 = caminho1[1]
+                #print(caminho_proximo_emp2)
+            else:
+                caminho_proximo_emp2 = caminho1[0]
+                #print(caminho_proximo_emp2)
+
+            dist_2 = dist1
+            #print("DADOS DA EMPI 2:")
+            #print(dist1)
+            #print(dist_1)
+            #print(caminho1)
+            #print(caminho_proximo_emp1)
+            #print(posicao_anterior)
+            #prioridade2 = prioridadeR
+
+            resultado = encontrar_e_navegar(inicio, fim, lugares_bloqueados, prioridade, dist1, dist_1, caminho1, caminho_proximo_emp1, IdE, posicao_anterior)
+
+        # Retornar resultados como JSON para o server.js
+        #print("Resultado------>")
+        #resultado["caminho_completo"] = list(resultado["caminho_completo"])
+
+        ################### dest --- falta pegar do resultado ###################
+        
+
+        
+        string_proxima_posicao = resultado["ordem_caminho"].copy()
+        proxima_posicao = string_proxima_posicao.split(" ")[3]
+        #print(proxima_posicao)
+        atual, prox = posicao_intermed(inicio,proxima_posicao) #pegar
+        angulo_referencia = encontrar_angulo_referencia(atual, prox)
+        #add função de pegar novo proximo caminho
+        ERRO = angulo_atual - angulo_referencia
+        vel_roda1, vel_roda2 = f_PID(ERRO)
+        print("----------------RESULTADO JSON:---------------------")
+        print(resultado)
+        print("-------------------------------------")
+        return vel_roda1, vel_roda2
+    else:
+        atual, prox = posicao_intermed(inicio,proxima_posicao) #pegar
+        angulo_referencia = encontrar_angulo_referencia(atual, prox)
+        #add função de pegar novo proximo caminho
+        ERRO = angulo_atual - angulo_referencia
+        vel_roda1, vel_roda2 = f_PID(ERRO)
+        ################### dest --- falta pegar do resultado ###################
+        
+        ################### nao sei oq retorna aqui ###################
+        return vel_roda1, velc_roda2
+    #return jsonify(resultado)
+    
+
+    #pegar proxima posição do json e enviar
+
+    #return jsonify(resultado)
+
 def posicao_intermed(inic, fin):
     for item in dados_json2:
         if item['atual'] == inic and item['proxima'] == fin:
@@ -877,115 +1024,49 @@ def checa_menor_caminho(inicio, fim):
     else:
         return inicio, fim, 0
 
-@app.route('/calcular_caminho', methods=['POST'])
-def calcular_caminho():
-    global dist_2  # Declare dist_2 como uma variável global
-    global dist_1 # Declare dist_2 como uma variável global
-    global caminho_proximo_emp1  # Declare dist_2 como uma variável global
-    global caminho_proximo_emp2  # Declare dist_2 como uma variável global
-    global prioridade1
-    global prioridade2
-    global angulo_atual
 
-    data = request.json
-    print(data)
-    # Extrair parâmetros do JSON enviado pelo server.js
-    inicio1 = data.get('posicao_atual')
-    fim1 = data.get('positionCode')
-    lugares_bloqueados = data.get('caminho_bloqueado')
-    prioridadeSTR = data.get('priority')
-    posicao_anterior = data.get('posicao_anterior')
-    IdESTR = data.get('forkliftNumber')
-    angulo_atual = data.get('angulo_car')
+def f_PID(erro_input):
     
+    global I, lastError, aux
+    #erro2 = beta*posicao_anterior + (1 - beta)*erro_input
+    erro2 = erro_input
+    P = erro2
+    I += erro2
+    D = erro2 - lastError
+    lastError = erro2
+    #posicao_anterior = erro2
+        
+    motorspeed = (P * Kp + I * Ki + D * Kd) 
+    #print(f"PID: {motorspeed}")
+    """
+    print(f"P: {P}")
+    print(f"I: {I}")
+    print(f"D: {D}")
+    print(f"erro: {erro}")
+    """
+    #pid.append(motorspeed)
+    #error.append(erro_input)
+    #np.savetxt('controle.txt', pid)
+    #np.savetxt('Saida.txt', error)
+        
+    #aux += 1
+    #print(f"aux: {aux}")
+    motorspeeda = basespeeda + motorspeed
+    motorspeedb = basespeedb - motorspeed
+
+    if motorspeeda > maxspeeda:
+        motorspeeda = maxspeeda
+    if motorspeedb > maxspeedb:
+        motorspeedb = maxspeedb
+    if motorspeeda < 0:
+        motorspeeda = 0
+    if motorspeedb < 0:
+        motorspeedb = 0
+        
+    velocidade1 = motorspeeda
+    velocidade2 = motorspeedb
     
-
-    #resultado = []
-    IdE = int(IdESTR)
-    print("ID:----------------------")
-    print(IdE)
-    print(type(IdE))
-    print(repr(IdE))
-    prioridadeR = int(prioridadeSTR)
-    print((prioridadeR))
-    print("LUGARES BLOQUEADOS--------")
-    print(lugares_bloqueados)
-
-    if prioridade1 > prioridade2:
-        prioridade = 1
-    elif prioridade1 < prioridade2:
-        prioridade = 2
-    else:
-        prioridade = 0
-    resultado = {"erro": "não consegui entrar nas condicoes"}
-
-    inicio, fim, checagem = checa_menor_caminho(inicio1, fim1)
-
-    if(checagem == 1):
-        [dist1, caminho1] = encontrar_menor_caminho(grafo, inicio, fim, posicao_anterior)
-        print("prints da função encontrar_menor_caminho-------------")
-        print(dist1)
-        print(caminho1)
-        print("------------")
-        if IdE == 1:
-            if len(caminho1)>1:
-                caminho_proximo_emp1 = caminho1[1]
-                print(caminho_proximo_emp1)
-
-            else:
-                caminho_proximo_emp1 = caminho1[0]
-                print(caminho_proximo_emp1)
-
-            dist_1 = dist1
-            print("DADOS DA EMPI 1:")
-            print(dist_1)
-            print(dist_2)
-            print(caminho1)
-            print(caminho_proximo_emp2)
-            print(posicao_anterior)
-            prioridade1 = prioridadeR
-
-            resultado = encontrar_e_navegar(inicio, fim, lugares_bloqueados, prioridade, dist_1, dist_2, caminho1, caminho_proximo_emp2, IdE, posicao_anterior)
-        if IdE == 2:
-            if len(caminho1)>1:
-                caminho_proximo_emp2 = caminho1[1]
-                print(caminho_proximo_emp2)
-            else:
-                caminho_proximo_emp2 = caminho1[0]
-                print(caminho_proximo_emp2)
-
-            dist_2 = dist1
-            print("DADOS DA EMPI 2:")
-            print(dist1)
-            print(dist_1)
-            print(caminho1)
-            print(caminho_proximo_emp1)
-            print(posicao_anterior)
-            prioridade2 = prioridadeR
-
-            resultado = encontrar_e_navegar(inicio, fim, lugares_bloqueados, prioridade, dist1, dist_1, caminho1, caminho_proximo_emp1, IdE, posicao_anterior)
-
-        # Retornar resultados como JSON para o server.js
-        print("Resultado------>")
-        #resultado["caminho_completo"] = list(resultado["caminho_completo"])
-
-        ################### dest --- falta pegar do resultado ###################
-        atual,prox = posicao_intermed(inicio,dest)
-
-        angulo_referencia = encontrar_angulo_referencia(atual, prox)
-
-        print(resultado)
-        return resultado
-    else:
-        ################### dest --- falta pegar do resultado ###################
-        atual,prox = posicao_intermed(inicio,dest)
-
-        angulo_referencia = encontrar_angulo_referencia(atual, prox)
-        ################### nao sei oq retorna aqui ###################
-        return None
-    #return jsonify(resultado)
-
-
+    return velocidade1, velocidade2
 
 def encontrar_menor_caminho_com_instrucoes(grafo, inicio, fim, lugares_bloqueados, posicao_anterior):
     distancia = {posicao: float('inf') for posicao in grafo}
@@ -1175,11 +1256,11 @@ def encontrar_e_navegar(inicio, fim, lugares_bloqueados, prioridade, dist1, dist
         #talvez por um return aq
     else:
         prox_outro = caminho_outro
-        print("PROXIMO DO OUTRO ------------------------------------")
-        print(prox_outro)
+        #print("PROXIMO DO OUTRO ------------------------------------")
+        #print(prox_outro)
         prox = caminho_aux[1]
-        print("MEU CAMINHO PROXIMO")
-        print(prox)
+        #print("MEU CAMINHO PROXIMO")
+        #print(prox)
 
         if prox == lugares_bloqueados:
             if (prioridade == 1 and IdE == 1) or (prioridade == 2 and IdE == 2) or (
@@ -1234,24 +1315,24 @@ def encontrar_e_navegar(inicio, fim, lugares_bloqueados, prioridade, dist1, dist
 
         else:
             if prox == prox_outro:
-                print("-----------------------------------")
-                print("ENTREI NO IF DO PROXIMO")
-                print("PRIORIDADE 1")
-                print(prioridade1)
-                print("PRIORIDADE 2")
-                print(prioridade2)
-                print("PRIORIDADE")
-                print(prioridade)
-                print(IdE)
+                #print("-----------------------------------")
+                #print("ENTREI NO IF DO PROXIMO")
+                #print("PRIORIDADE 1")
+                #print(prioridade1)
+                #print("PRIORIDADE 2")
+                #print(prioridade2)
+                #print("PRIORIDADE")
+                #print(prioridade)
+                #print(IdE)
                 if (prioridade == 1 and IdE == 2) or (prioridade == 2 and IdE == 1) or (
                         prioridade == 0 and IdE == 2 and (dist2 > dist1)) or (
                         prioridade == 0 and IdE == 1 and (dist1 > dist2)):
-                        print("Identifiquei ordem de espera")
+                        #print("Identifiquei ordem de espera")
                         resultado["ordem_caminho"] = "Espere pela outra empilhadeira para continuar"
                 else:
                     melhor_caminho = encontrar_menor_caminho_com_instrucoes(grafo, inicio, fim, lugares_bloqueados,
                                                                             posicao_anterior)
-                    print("ENTREI NO MELHOR CAMINHO AO INVES DE MANDAR ESPERAR")
+                    #print("ENTREI NO MELHOR CAMINHO AO INVES DE MANDAR ESPERAR")
                     if melhor_caminho:
                         dist, caminho = melhor_caminho
                         #print(f"Melhor caminho entre {inicio} e {fim}: ")
@@ -1295,7 +1376,7 @@ def encontrar_e_navegar(inicio, fim, lugares_bloqueados, prioridade, dist1, dist
 IdE1 = 1
 IdE2 = 2
 
-if __name__ == '__main__':
+if _name_ == '_main_':
     app.run(port=5001)  # Porta diferente do Flask para evitar conflitos com o server.js
 
 # Informações de inicio e fim de movimentações
@@ -1327,5 +1408,3 @@ lugares_bloqueados2 = inicio1
 [dist1, caminho1] = encontrar_menor_caminho(grafo, inicio1, fim1, posicao_anterior1)
 
 [dist2, caminho2] = encontrar_menor_caminho(grafo, inicio2, fim2, posicao_anterior2)
-
-
